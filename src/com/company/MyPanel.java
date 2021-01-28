@@ -9,9 +9,11 @@ import java.io.IOException;
 
 public class MyPanel extends JPanel {
     BufferedImage grass;
+    Hero hero;
 
-    public MyPanel(){
-setLayout(null);
+    public MyPanel() {
+        setLayout(null);
+        hero = new Hero(0, 0);
         try {
             grass = ImageIO.read(new File("Images\\grass.png"));
         } catch (IOException e) {
@@ -22,8 +24,11 @@ setLayout(null);
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponents(g);
-        for(int yg = 0; yg < 600; yg +=50)
-            for(int xg = 0; xg < 800; xg+=50)
-        g.drawImage(grass,xg,yg,null);
+        for (int yg = 0; yg < 600; yg += 50) {
+            for (int xg = 0; xg < 800; xg += 50) {
+                g.drawImage(grass, xg, yg, null);
+            }
+        }
+                hero.draw(g);
     }
 }
