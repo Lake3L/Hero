@@ -1,5 +1,7 @@
 package com.company;
 
+import ShowModels.Hero;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -45,15 +47,19 @@ public class MyPanel extends JPanel {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            mx = e.getX();
-            my = e.getY();
-            click = true;
-            repaint();
+
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
+            mx = e.getX();
+            my = e.getY();
 
+            int cx = mx/50;
+            int cy = my/50;
+
+            click = true;
+            repaint();
         }
 
         @Override
@@ -76,6 +82,7 @@ public class MyPanel extends JPanel {
         addKeyListener(new MyKL());
         addMouseListener(new MyML());
         setFocusable(true);
+        setPreferredSize(new Dimension(Const.W, Const.H));
         hero = new Hero(0, 0);
         try {
             grass = ImageIO.read(new File("Images\\grass.png"));
