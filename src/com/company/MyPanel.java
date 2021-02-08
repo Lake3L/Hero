@@ -1,21 +1,22 @@
 package com.company;
 
+import ShowModels.Covid;
 import ShowModels.Hero;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MyPanel extends JPanel {
     BufferedImage grass;
     Hero hero;
+    ArrayList<Covid> covids;
+    Covid transferC;
 
     boolean click = false;
     int mx, my;
@@ -52,19 +53,46 @@ public class MyPanel extends JPanel {
 
         @Override
         public void mousePressed(MouseEvent e) {
-            mx = e.getX();
-            my = e.getY();
 
-            int cx = mx/50;
-            int cy = my/50;
-
-            click = true;
-            repaint();
+            int cx = e.getX() / Const.STEP;
+            int cy = e.getY() / Const.STEP;
+            if(e.getButton() == 1) {
+                covids.add(new Covid(cx * Const.STEP, cy * Const.STEP));
+            }
+            if(e.getButton() == 2){
+                cx = cx * Const.STEP;
+                cy = cy * Const.STEP;
+                Covid c = null;
+                for(Covid covid: covids) {
+                    if (covid.collision(cx, cy))
+                        c = covid;
+                }
+                if (c != null)
+                    covids.remove(c);
+            }
+            if (e.getButton() == 3) {
+                cx = cx * Const.STEP;
+                cy = cy * Const.STEP;
+                for (Covid covid : covids) {
+                    if (covid.collision(cx, cy)) {
+                        transferC = covid;
+                        break;
+                    }
+                }
+            }
+                repaint();
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-
+            if(transferC == null)
+                return;
+            int cx = e.getX() / Const.STEP;
+            int cy = e.getY() / Const.STEP;
+            transferC.setX(cx * Const.STEP);
+            transferC.setY(cy * Const.STEP);
+            transferC = null;
+            repaint();
         }
 
         @Override
@@ -77,13 +105,33 @@ public class MyPanel extends JPanel {
 
         }
     }
+
+    class MyMML implements MouseMotionListener{
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            if(transferC == null)
+                return;
+            transferC.setX(e.getX());
+            transferC.setY(e.getY());
+            repaint();
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+
+        }
+    }
+
     public MyPanel() {
         setLayout(null);
         addKeyListener(new MyKL());
         addMouseListener(new MyML());
+        addMouseMotionListener(new MyMML());
         setFocusable(true);
         setPreferredSize(new Dimension(Const.W, Const.H));
         hero = new Hero(0, 0);
+        covids = new ArrayList<>();
         try {
             grass = ImageIO.read(new File("Images\\grass.png"));
         } catch (IOException e) {
@@ -104,6 +152,14 @@ public class MyPanel extends JPanel {
         hero.stepY(Const.STEP);
     }
 
+    public void checkCollision(){
+        for(Covid covid: covids){
+            if(hero.collision(covid)){
+                System.out.println("Game Over........... ");
+                setFocusable(false);
+            }
+        }
+    }
 
     @Override
     public void paintComponent(Graphics g) {
@@ -113,11 +169,9 @@ public class MyPanel extends JPanel {
                 g.drawImage(grass, xg, yg, null);
             }
         }
+        for(Covid covid: covids)
+            covid.draw(g);
         hero.draw(g);
-        if (click) {
-            g.setColor(Color.RED);
-            g.fillOval(mx, my, Const.STEP, Const.STEP);
-            click = false;
+        checkCollision();
         }
-    }
     }

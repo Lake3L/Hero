@@ -41,4 +41,11 @@ abstract public class Model {
     public void setY(int y) {
         this.y = y;
     }
+
+    public boolean collision(Model other){
+        return collision(other.x, other.y);
+    }
+    public boolean collision(int x, int y){
+        return this.x == x && this.y == y;
+    }
 }
